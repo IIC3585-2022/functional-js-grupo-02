@@ -10,7 +10,6 @@
  */
 
 /**
- *
  * @returns {State}
  */
 export const stateFactory = () => ({
