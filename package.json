@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "application": "node src/index.js"
+    "application": "node src/index.js",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix"
   },
   "repository": {
     "type": "git",
