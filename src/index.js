@@ -1,58 +1,42 @@
-import { stateFactory } from './state.js';
+import promptSync from 'prompt-sync';
 
-/**
- * @typedef {import('./state.js').State} State
- */
+const prompt = promptSync();
 
-/**
- * @param {string} location
- * @returns {number}
- */
-const getScoreFromLocation = (location) => {
-  if (location === 'A2') {
-    return 3;
+const getScoreFromThrow = (play) => {
+  if (play === 'DB') {
+    return 50;
+  } else if (play === 'SB') {
+    return 25;
   }
-  return 1;
-}
+  return play.map((num) => Number(num)).reduce((acc, curr) => acc * curr, 1);
+};
 
-/**
- * @param {string} location
- * @param {number} points
- *
- * @returns {number}
- */
-const throwDart = (location, points) => {
-  return Math.abs(points - getScoreFromLocation(location))
-}
+const calculatePoints = (points, plays) => Math.abs(
+  plays.reduce((acc, play) => acc - getScoreFromThrow(play), points),
+);
 
-/**
- * @param {State} state
- *
- * @returns {boolean}
- */
-const gameFinished = (state) => {
-  return false;
-}
+const calculatePlayerPoints = ({ name, points }, plays) => (
+  { name, points: calculatePoints(points, plays) }
+);
 
-/**
- * @param {State} state
- *
- * @returns {State}
- */
-const modifyState = (state) => {
-  const newScore = throwDart();
-  return { ...state, score: newScore };
-}
-
-/**
- * @param {State} state
- *
- * @returns {State}
- */
-const playGame = (state) => {
-  const stateCopy = modifyState(state);
-  if (gameFinished(stateCopy)) {
-    return stateCopy;
+const playRound = (players) => {
+  const [currentPlayer, ...otherPlayers] = players;
+  console.log(`${currentPlayer.name}'s turn`);
+  const play = JSON.parse(prompt('Please enter his/her play: '));
+  const currentPlayerMod = calculatePlayerPoints(currentPlayer, play);
+  console.log(`${currentPlayerMod.name} has ${currentPlayerMod.points} left`);
+  if (currentPlayerMod.points !== 0) {
+    return playRound([...otherPlayers, currentPlayerMod]);
   }
-  return playGame(stateCopy);
-}
+  return currentPlayerMod;
+};
+
+const initGame = (...names) => names.map((name) => ({ name, points: 501 }));
+
+const playGame = (...names) => {
+  const players = initGame(...names);
+  const winner = playRound(players);
+  console.log(`${winner.name} won`);
+};
+
+playGame('Moisés', 'Daniel', 'Matías');
