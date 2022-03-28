@@ -11,7 +11,7 @@ const prompt = promptSync();
  * @returns {IOMonad<Array<Play>>}
  */
 export const getPlays = () => {
-  const monad = new IOMonad(() => prompt('Please enter his/her play: '));
+  const monad = new IOMonad(() => prompt('Please enter this player\'s 3 dart shots: '));
   return monad.map(JSON.parse);
 };
 
