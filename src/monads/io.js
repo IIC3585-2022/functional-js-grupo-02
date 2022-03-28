@@ -8,12 +8,14 @@
  * @template T
  */
 export class IOMonad {
+  /** @type {Effect<T>} */
+  #effect;
+
   /**
    * @param {Effect<T>} effect
    */
   constructor(effect) {
-    /** @type {Effect<T>} */
-    this.effect = effect;
+    this.#effect = effect;
   }
 
   /**
@@ -31,7 +33,7 @@ export class IOMonad {
    * @returns {IOMonad<A>}
    */
   map(f) {
-    return new IOMonad(() => f(this.effect()));
+    return new IOMonad(() => f(this.eval()));
   }
 
   /**
@@ -40,13 +42,13 @@ export class IOMonad {
    * @returns {IOMonad<A>}
    */
   chain(f) {
-    return new IOMonad(() => f(this.effect()).effect());
+    return new IOMonad(() => f(this.eval()).eval());
   }
 
   /**
    * @returns {T}
    */
   eval() {
-    return this.effect();
+    return this.#effect();
   }
 }
