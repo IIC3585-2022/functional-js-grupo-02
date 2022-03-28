@@ -2,7 +2,7 @@
   "name": "functional-js-grupo-02",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "src/main.js",
   "type": "module",
   "scripts": {
     "demo": "node demo.js",

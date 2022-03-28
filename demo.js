@@ -1,3 +1,3 @@
-import { playGame } from './src/index.js';
+import { playGame } from './src/main.js';
 
 playGame('Moisés', 'Daniel', 'Matías');
