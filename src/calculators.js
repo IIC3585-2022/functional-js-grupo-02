@@ -30,12 +30,12 @@ export const calculateScore = (score, plays) => {
    * @param {Array<Play>} pls
    * @returns {number}
    */
-  const reduced = (pls) => _.reduce(
+  const combine = (pls) => _.reduce(
     pls,
     (acc, play) => acc - getScoreFromThrow(play),
     score,
   );
-  return Math.abs(plays.map(reduced).eval());
+  return Math.abs(plays.map(combine).eval());
 };
 
 /**
