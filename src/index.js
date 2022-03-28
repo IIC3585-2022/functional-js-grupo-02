@@ -1,4 +1,6 @@
 import promptSync from 'prompt-sync';
+import * as _ from 'lodash-es';
+import { IOMonad } from './monads/io.js';
 
 /**
  * @typedef {import('./types.js').Player} Player
@@ -7,6 +9,14 @@ import promptSync from 'prompt-sync';
  */
 
 const prompt = promptSync();
+
+/**
+ * @returns {IOMonad<Array<Play>>}
+ */
+const getPlays = () => {
+  const monad = new IOMonad(() => prompt('Please enter his/her play: '));
+  return monad.map(JSON.parse);
+};
 
 /**
  * @param {Play} play
@@ -24,17 +34,22 @@ const getScoreFromThrow = (play) => {
 
 /**
  * @param {number} score
- * @param {Array<Play>} plays
+ * @param {IOMonad<Array<Play>>} plays
  * @returns {number}
  */
-const calculateScore = (score, plays) => Math.abs(
-  plays.reduce((acc, play) => acc - getScoreFromThrow(play), score),
-);
+const calculateScore = (score, plays) => {
+  /**
+   * @param {Array<Play>} pls
+   * @returns {number}
+   */
+  const reduced = (pls) => _.reduce(pls, (acc, play) => acc - getScoreFromThrow(play), score);
+  return Math.abs(plays.map(reduced).eval());
+};
 
 /**
  *
  * @param {Player} player
- * @param {Array<Play>} plays
+ * @param {IOMonad<Array<Play>>} plays
  * @returns {Player}
  */
 const calculatePlayerScore = ({ name, score }, plays) => (
@@ -48,8 +63,8 @@ const calculatePlayerScore = ({ name, score }, plays) => (
 const playRound = (f) => (players) => {
   const [currentPlayer, ...otherPlayers] = players;
   console.log(`${currentPlayer.name}'s turn`);
-  const play = JSON.parse(prompt('Please enter his/her play: '));
-  const currentPlayerMod = calculatePlayerScore(currentPlayer, play);
+  const plays = getPlays();
+  const currentPlayerMod = calculatePlayerScore(currentPlayer, plays);
   console.log(`${currentPlayerMod.name} has ${currentPlayerMod.score} left`);
   if (currentPlayerMod.score !== 0) {
     return f([...otherPlayers, currentPlayerMod]);
