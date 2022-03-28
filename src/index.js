@@ -19,23 +19,26 @@ const calculatePlayerPoints = ({ name, points }, plays) => (
   { name, points: calculatePoints(points, plays) }
 );
 
-const playRound = (players) => {
+const playRound = f => (players) => {
   const [currentPlayer, ...otherPlayers] = players;
   console.log(`${currentPlayer.name}'s turn`);
   const play = JSON.parse(prompt('Please enter his/her play: '));
   const currentPlayerMod = calculatePlayerPoints(currentPlayer, play);
   console.log(`${currentPlayerMod.name} has ${currentPlayerMod.points} left`);
   if (currentPlayerMod.points !== 0) {
-    return playRound([...otherPlayers, currentPlayerMod]);
+    return f([...otherPlayers, currentPlayerMod]);
   }
   return currentPlayerMod;
 };
+
+const Y = f => (x => x(x))(x => f(y => x(x)(y)));
 
 const initGame = (...names) => names.map((name) => ({ name, points: 501 }));
 
 const playGame = (...names) => {
   const players = initGame(...names);
-  const winner = playRound(players);
+  // const winner = playRound(players);
+  const winner = Y(playRound)(players) ;
   console.log(`${winner.name} won`);
 };
 
